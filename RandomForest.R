@@ -12,8 +12,9 @@ index_train <- sample(1:nrow(data), 4/5 * nrow(data))
 train_set <- data[index_train, ]
 valid_set <- data[-index_train, ]
 
+
 #Tuning mtry parameter
-tuneRF(train_set[,-1],train_set[,30], ntreeTry=50, stepFactor = 1.5,
+tuneRF(train_set[,2:29],train_set[,30], stepFactor = 1.5,
        plot=TRUE, trace=TRUE, doBest=TRUE)
 
 # random forest 
@@ -22,8 +23,9 @@ RF <- randomForest(target_0~. -ID_TRAIN, data = train_set ,
              importance = TRUE)
 
 #Output variable importance based on MSE increase %
-importance(RF, type=1)
+importance <- importance(RF, type=1)
 #Plot of variable importance for random forest
-varImpPlot(RF, sort=FALSE, main="VARIABLE IMPORTANCE PLOT")
+varImpPlot <-  varImpPlot(RF,type=1, main="VARIABLE IMPORTANCE PLOT")
+
 
 
