@@ -7,20 +7,20 @@ output: pdf_document
 
 ## 1. Presentation of the subject
 
-This project is interested in proposing a tutorial for variable importance and variable selection in random forests using different R resources. The methods used in the following sections are purely designed for prediction setting and not an inference one. Before diving into the tutorial, each element discussed are briefly reviewed.
+This project is intended in proposing a tutorial for variable importance and variable selection in random forests using different R resources. The methods used in the following sections are purely designed for prediction setting and not an inference one. Before diving into the tutorial, each element discussed are briefly reviewed.
 
 ### 1.3 Random Forests 
-Random forests are in the family of ensemble methods. The principle is fairly simple. It combines many regression trees or classification trees using several bootstrap samples from the training data and randomly selecting a subset of the explanatory variables at each node in order to split the data. Amongst the random subset, one is selected using CART or Inference method to split. Additional details will be provided on this matter and these very powerful algorithms.
+Random forests are in the family of ensemble methods. The principle is fairly simple. It combines many regression or classification trees using several bootstrap samples from the training data and randomly selecting a subset of the explanatory variables at each node in order to split the data. Amongst the random subset, one is selected using CART or Inference method to split. Additional details will be provided on this matter and these very powerful algorithms.
 
 ### 1.1 Variable importance 
-Variable importance can be defined as the contribution of each predictor to the model. it is usually represented as a ranking of the variables based on the effect they have on the generated model. Knowing which variables significantly impacts the quality of the predictions helps analysts weed out those that are not necessary and help , in certain cases, improve the quality of the predictions.
+Variable importance can be defined as the contribution of each predictor to the model. It is usually represented as a ranking of the variables based on the effect they have on the generated model. Knowing which variables significantly impacts the quality of the predictions helps analysts weed out those that are not necessary and help , in certain cases, improve the quality of the predictions.
 
 ### 1.2 Variable selection 
-Variable selection consists of removing certain predictors from a model in order to improve the quality of a prediction. Following Kohavi and John (1997) and Guyon and Elisseff (2003), three groups of methods are distinguishable. First, "wrapper", which look closely at the prediction performance of a model to make variable selection. Second, "filter", the score of variable importance is not based on a model design and finally, "embedded" which combine both model estimation and variable selection.
+Variable selection consists of removing certain predictors from a model in order to improve the quality of a prediction. Following Kohavi and John (1997) and Guyon and Elisseff (2003), three groups of methods are distinguishable. First, "wrapper", which look closely at the prediction performance of a model to make variable selection. Second, "filter", the score of variable importance is not based on a model design and finally, "embedded" which combines both model estimation and variable selection.
 
 
 ### Outline 
-This project is organized as follows. A description of important literature and the most recent algorithms used in R regarding variable importance and selection using trees. Next, an overview of the methods to be used in the tutorials. To continue, a section will be dedicated to review R references that will be used on a simulated data set.This last part will be a demonstration of how to perform variable selection and variable importance using the references presented in the appropriate sections.
+This project is organized as follows. A description of important literature and the most recent algorithms used in R regarding variable importance and selection using trees. Next, an overview of the methods to be used in the tutorials. To continue, a section will be dedicated to review R resources that will be used on a simulated data set.This last part will be a demonstration of how to perform variable selection and variable importance using the references presented in the appropriate sections.
 
 \newpage 
 
@@ -30,7 +30,7 @@ This project is organized as follows. A description of important literature and 
 Random forests are based on decision trees with bootstrap aggregation called "bagging". It is a method used to generate multiple versions of a predictor to get an average predictor. Randomness is introduced in each predictor by making bootstrap replicates. As low bias is the feature of tree based models, high variance is one of its drawbacks dependent on the number of features that leads to larger trees and potential vulnerability to over fitting. However, compared to other tree models like CART and conditional inference tree, random forest models use bootstrap aggregation technique with random features to do prediction and afterwards uses weighted averaging which lowers the variance of predictions compared to classical decision tree models. The algorithm could be summarized by the following pseudo code Breiman  (2001) : 
 
 1) For a training set of length N, sample N instances at random with replacement.
-2) Grow a tree on the bootstrap training set using a specified number of random features
+2) Grow a tree on the bootstrap training set using a specified number of random features.
 3) Repeat step 1 and 2 for the set number of estimators.
 4) Average predictions or take majority vote (depending on type of task).
 
@@ -92,29 +92,29 @@ Variable selection in random forest is mainly based on the variable importance i
 
 #### Recursive feature elimination (RFE) and non recursive feature elimination (NRFE)
 
-RFE's objective is to find the smallest number of variables that help get the best predictive model. It follows the following steps :
+RFE's objective is to find the smallest number of variables that help to get the best predictive model. It follows the following steps :
 
-1. Train a random forests
-2. Compute the permutation importance measure
+1. Train a random forest.
+2. Compute the permutation importance measure.
 3. Eliminate the less relevant variable(s).
 4. Repeat steps 1 to 3 until no further variables remain.
 
-This method is an improved version of the NRFE, which was proven to be less efficient on correlated data. The update of the ranking based on variable importance has proven to be more effective in presence of correlation withing the covariates. For that reason, NRFE will not be used in the following tutorials.  Gregorutti et al (2016)
+This method is an improved version of the NRFE, which was proven to be less efficient on correlated data. The update of the ranking based on variable importance has proven to be more effective in presence of correlation withing the covariates. For that reason, NRFE will not be used in the following tutorials (Gregorutti et al (2016)).
 
 #### Boruta
 
-This method was developed to find all relevant variables within a classification framework. Kursa and Rudnicki (2010) describe the Boruta algorithm with the following steps:
+This method was developed to find all relevant variables within a classification framework. Kursa and Rudnicki (2010) described the Boruta algorithm with the following steps:
 
 The Boruta algorithm consists of following steps:
 1. Extend the training data by adding copies of all variables (the data is always extended by at least 5 duplicate attributes, even if the number of attributes in the original set is lower than 5).
 
-2. Shuffle the added attributes to remove their correlations with the response.The goal here is to break the link between $Y$ and $X$
+2. Shuffle the added attributes to remove their correlations with the response.The goal here is to break the link between $Y$ and $X$.
 
 3. Run a random forest classifier on the extended data set and gather the Z scores computed. The Z score is calculated based on the loss of accuracy in classification task.
 
 4. Find the maximum Z score among duplicate attributes, and then assign a hit to every attribute that scored better than the maximum Z score.
 
-5. For each attribute with undetermined importance perform a two-sided test of equality with the maximum z score
+5. For each attribute with undetermined importance perform a two-sided test of equality with the maximum z score.
 
 6. Deem the attributes which have importance significantly lower than the maximum z score as ‘unimportant’ and permanently remove them from the data set.
 
@@ -127,7 +127,7 @@ algorithm has reached the previously set limit of the random forest runs.
 
 
 #### Vsurf
-The Vsurf method is both useful in regression and classification tasks. It is also used for interpretation and prediction. The algorithm in question is performed in two different steps and it is described as follows. Genuer et al. (2015)
+The Vsurf method is both useful in regression and classification tasks. It is also used for interpretation and prediction. The algorithm in question is performed in two different steps and it is described as follows (Genuer et al. (2015)).
 
 Step 1 : Preliminary ranking and elimination. 
 
@@ -135,7 +135,7 @@ a) This step consists of ranking the variables using the classical variable impo
 
 b) Based on a certain threshold, eliminate all variables for which the variable importance index is below the threshold. The threshold in question is estimated by calculating the standard deviation of variable importance. Other strategies could be used to find the best threshold.
 
-Step 2 : variable selection.
+Step 2 : Variable selection.
 
 a) For interpretation.
 The algorithm uses a very simple method to select the most performing model. For $k=1$ to $m$, a Random Forest model is built using $m$ important variables following the ranking previously estimated where 1 is the most important variable. Using a different number of runs, typically 25, select the variables that lead to the smallest OOB error.
@@ -144,18 +144,18 @@ b) For prediction.
 In order to improve the prediction performance, start with the ordered sequence of variables selected in the interpretation step. From there, build different random forests by following the order of variable importance from the previous step and use a step wise algorithm to eliminate variables that increase the OOB prediction error by a previously selected threshold.
 
 #### Jefferie S. Evans et al. method for model selection (Parsimony)
-The purpose of the authors of the following method was to simplify as much a s possible the complexity of the models. They used the permuted variable importance measure to do so. The method starts by fitting a random forest with all variables and estimates variable importance. The values are then ranked and standardized to a certain ratio. Then, it alliteratively subsets variables within a given ratio and fitting a model for each subset. The resulting model is compared to the original model which is kept constant. The performance is calculated on the OOB error which can include a penalty for the number of parameters in order to reduce the complexity of the model.
+The purpose of the authors of the following method was to simplify as much as possible the complexity of the models. They used the permuted variable importance measure to do so. The method starts by fitting a random forest with all variables and estimates variable importance. The values are then ranked and standardized to a certain ratio. Then, it alliteratively subsets variables within a given ratio and fitting a model for each subset. The resulting model is compared to the original model which is kept constant. The performance is calculated on the OOB error which can include a penalty for the number of parameters in order to reduce the complexity of the model.
 
 #### Altmann 
-Altmann's method is based on an approach that keeps the values and the correlation structure of the  covariates intact while computing variable importance under a null hypothesis of no association between predictor and the response variable. Instead of permuting the values of $X_j$, it permutes the values of the outcome and then multiple random forests are trained and new variable importance are calculated. If the variable importance in the original model without permutation is significantly different than 0, then the variable is kept. Otherwise, it is deemed as non important and can be discarded from the model. This initial approach is called the permutation approach and is a basic method. Altmann's modifications are implemented with the distribution of the variable importance under the null hypothesis. In other words, in order to allow less training of random forests and to get a conclusive test, it is important to make the right assumptions on the variable importance distribution and the author of the described method allows a parametric approach to estimate the P-values by fitting a specific probability distribution such as a normal, a log-normal etc.
+Altmann's method is based on an approach that keeps the values and the correlation structure of the  covariates intact while computing variable importance under a null hypothesis of no association between predictor and the response variable. Instead of permuting the values of $X_j$, it permutes the values of the outcome and then multiple random forests are trained and new variable importance are calculated. If the variable importance in the original model without permutation is significantly different than 0, then the variable is kept. Otherwise, it is deemed as non-important and can be discarded from the model. This initial approach is called the permutation approach and is a basic method. Altmann's modifications are implemented with the distribution of the variable importance under the null hypothesis. In other words, in order to allow less training of random forests and to get a conclusive test, it is important to make the right assumptions on the variable importance distribution and the author of the described method allows a parametric approach to estimate the P-values by fitting a specific probability distribution such as a normal, a log-normal etc.
 
 #### Recurrent relative variable importance
-This approach is used in case the number of unimportant variables in a data set is large. The selection method is simply based on a ratio of different random forest fits. In other words, first, several random forests are generated based on the data set and parameter values differing only in the seed of the random number generating process. Each random forest is used to compute the variable importance using the classical method and the values obtained are divided by the absolute minimal importance observed in each run. This outputs relative values and each variable having an importance greater or equal to a predetermined factor is kept.
+This approach is used in case the number of unimportant variables in a data set is large. The selection method is simply based on a ratio of different random forest fits. In other words, first, several random forests are generated based on the data set and parameter values differing only in the seed of the random number generating process. Each random forest is used to compute the variable importance using the classical method and the values obtained are divided by the absolute minimum importance observed in each run. This outputs relative values and each variable having an importance greater or equal to a predetermined factor is kept.
 
 #### Cross-validated permutation variable importance for variable selection
 This method randomly splits the data set into k sets of equal size. The method constructs k random forests, where the l-th forest is constructed based on observations that are not part of the l-th set. For each forest the fold-specific permutation variable importance measure is computed using all observations in the l-th data set: For each tree, the prediction error on the l-th data set is recorded. Then the same is done after permuting the values of each predictor variable.
 
-The differences between the two prediction errors are then averaged over all trees. The cross-validated permutation variable importance is the average of all k-fold-specific permutation variable importance. For classification the mean decrease in accuracy over all classes is used and for regression the mean decrease in MSE. Janitza et al.(2015)
+The differences between the two prediction errors are then averaged over all trees. The cross-validated permutation variable importance is the average of all k-fold-specific permutation variable importances. For classification the mean decrease in accuracy over all classes is used and for regression the mean decrease in MSE (Janitza et al.(2015)).
 
 ## 4. Review of R resources 
 For each method listed above, the following section will provide a detailed overview of R resources allowing to perform the algorithms in question.
@@ -163,7 +163,7 @@ For each method listed above, the following section will provide a detailed over
 ### 4.1 Variable importance packages
 To calculate variable importance, two main packages are picked for comparison.
 
-The first one is the **randomForest** initially developed in Fortan by Leo Breiman and Adele Cutler and later on ported to R by Andy Liaw and Matthew Wiener. Two functions are of interest in this resource for variable importance. First, the **importance()** function and second, **varImpPlot()**. 
+The first one is the **randomForest** initially developed in Fortran by Leo Breiman and Adele Cutler and later on ported to R by Andy Liaw and Matthew Wiener. Two functions are of interest in this resource for variable importance. First, the **importance()** function and second, **varImpPlot()**. 
 
 ### 4.1.1 importance() function :
 
@@ -222,9 +222,9 @@ vimp.rfsrc(object, xvar.names, m.target = NULL, importance = c("permute", "rando
 
 *xvar.names* : User defined list of variable for which importance is calculated.
 
-*m.target* : label of the response variable for which the importance permutation will be calculated on. If nothing is specified, the code will select the default target variable fit on the random forest object.
+*m.target* : Label of the response variable for which the importance permutation will be calculated on. If nothing is specified, the code will select the default target variable fit on the random forest object.
 
-*importance* : Three different type of importance values that can be calculated. If the user selects "permute", the classical approach to calculating variable importance will be used. This approach was explained in the previous sections. If the user specifies "random", to break the link between the target variable and the covariate in question, the nodes will be selected at random and , finally, the last option is to select "anti". For this last approach, the covariate is split by sending systematically the instances in the opposite node.
+*importance* : Three different types of importance values that can be calculated. If the user selects "permute", the classical approach to calculating variable importance will be used. This approach was explained in the previous sections. If the user specifies "random", to break the link between the target variable and the covariate in question, the nodes will be selected at random and , finally, the last option is to select "anti". For this last approach, the covariate is split by sending systematically the instances in the opposite node.
 
 *block.size* : If block.size can be set from 1 to ntree. When set to ntree, comparison of OOB error will be made on the ensemble forest. On the other hand, if block.size is set to 1, tho OOB error is calculated by tree. Smaller values lead to better accuracy, but take more computation time. The user can make a compromise by selecting different block sizes.
 
@@ -246,7 +246,7 @@ holdout.vimp(formula, data, ntree = function(p, vtry){1000 * p / vtry}, nsplit =
 
 *data* : A data frame object containing the response and the covariates. 
 
-*ntree* : Number of tree for growing the forest.
+*ntree* : Number of trees for growing the forest.
 
 *nsplit* : Number of splits per node, the default value is 10. 
 
@@ -256,13 +256,13 @@ holdout.vimp(formula, data, ntree = function(p, vtry){1000 * p / vtry}, nsplit =
 
 *samptype* : Type of bootstrap used. "swor" which means sampling without replacement and "swr" means sampling with replacement.
 
-*vtry* : number of variable to be held-out when growing a tree, typically 1. 
+*vtry* : number of variables to be held-out when growing a tree, typically 1. 
 
-*block.size* : If block.size can be set from 1 to ntree. When set to ntree, comparison of OOB error will be made on the ensemble forest. On the other hand, if block.size is set to 1, tho OOB error is calculated by tree. Smaller values lead to better accuracy, but take more computation time. The user can make a compromise by selecting different block sizes.
+*block.size* : If block.size can be set from 1 to ntree. When set to ntree, comparison of OOB error will be made on the ensemble forest. On the other hand, if block.size is set to 1, though OOB error is calculated by tree. Smaller values lead to better accuracy, but require more computation time. The user can make a compromise by selecting different block sizes.
 
 ### Summary 
  
-The two previous functions allow to perform calculation to display and indicate which covariates are the most useful in predicting the response variable. The **importance** function in the **randomForest** offers a simple way to get the details and it's usage is very straightforward. Thanks to the function **varImpPlot()** the user can easily display the result of their findings. On the other hand, the **vimp.rfsrc()** function from the **randomforestSRC** package offers much more flexibility and user parameterization. One of the most interesting feature is the possibility to select the type of importance measure to compute and the number of trees used to obtain the OOB error comparison. Also, allowing for such personalization in the function helps the user alter the computation speed. For example, the analyst desiring to find out the importance of a group of variables could use the *joint* and specify those variable in the *x.var* argument to accelerate the process. Such flexibility is not offered in the **importance()** function. The last function covered for variable importance is the **holdout.vimp()** from the same package which offers important flexibility as well. The calculation methods are very different from one an other and results for the latter function require a large number of trees in order to lower the variance of the importance estimates.
+The two previous functions allow to perform calculations to display and indicate which covariates are the most useful in predicting the response variable. The **importance** function in the **randomForest** offers a simple way to get the details and it's usage is very straightforward. Thanks to the function **varImpPlot()** the user can easily display the result of their findings. On the other hand, the **vimp.rfsrc()** function from the **randomforestSRC** package offers much more flexibility and user parametrization. One of the most interesting features is the possibility to select the type of importance measure to compute and the number of trees used to obtain the OOB error comparison. Also, allowing for such customization in the function helps the user to alter the computation speed. For example, the analyst desiring to find out the importance of a group of variables could use the *joint* and specify those variable in the *x.var* argument to accelerate the process. Such flexibility is not offered in the **importance()** function. The last function covered for variable importance is the **holdout.vimp()** from the same package which offers important flexibility as well. The calculation methods are very different from one another and results for the latter function require a large number of trees in order to lower the variance of the importance estimates.
 
 The following table displays the summary of each function presented above. 
 
