@@ -277,3 +277,166 @@ vimp.rfsrc()|variable importance estimate|Three different approaches to estimate
 holdout.vimp()|variable importance estimate|Holding out certain variables from the growing process and comparing the predictions to the ones made without holding them out|[randomForestSRC](https://cran.r-project.org/web/packages/randomForestSRC/randomForestSRC.pdf)|
 
 ### 4.2 Variable selection packages
+
+For variable selection the following four main R packages will be considered.
+
+The first one is the **Boruta** package developed by Kursa and Rudnicki (2010). The main function for variable selection here is **Boruta** which applies the Boruta algorithm mentioned previously for variable selection.
+
+### 4.2.1 Boruta() function :
+
+**Function call :**  
+
+Boruta(x,y, pValue = 0.01, mcAdj = TRUE, maxRuns = 100, doTrace = 0, holdHistory = TRUE, getImp = getImpRfZ)
+
+*x* :
+
+*y* :
+
+*pValue* :
+
+*mcAdj* :
+
+*maxRuns* :
+
+*doTrace* :
+
+*holdHistory* :
+
+*getImp* :
+
+*formula* :
+
+*data* :
+
+### 4.2.2 VSURF() function :
+
+**Function call :**  
+
+VSURF(x, y, ntree = 2000, mtry = max(floor(ncol(x)/3), 1), nfor.thres = 50, nmin = 1,
+  nfor.interp = 25, nsd = 1, nfor.pred = 25, nmj = 1, RFimplem = "randomForest", parallel = FALSE, ncores = detectCores()- 1, 
+  clusterType = "PSOCK", verbose = TRUE)
+
+*x or formula* :
+
+*y* :
+
+*mtry* :
+
+*nfor.thres* :
+
+*nmin* :
+
+*nfor.interp* :
+
+*nsd* :
+
+*nfor.pred* :
+
+*nmj* :
+
+*RFimplem* :
+
+*parallel* :
+
+*ncores* :
+
+*clusterType* :
+
+*verbose* :
+
+*data* :
+
+*na.action* :
+
+### 4.2.3 PIMP() function ;
+
+**Function call :**  
+
+PIMP(X, y, rForest, S = 100, parallel = FALSE, ncores=0, seed = 123)
+
+*X* :
+
+*y* :
+
+*rForest* :
+
+*S* :
+
+*parallel* :
+
+*ncores* :
+
+*seed* :
+
+### 4.2.4 CVPVI() function :
+
+**Function call :**  
+
+CVPVI(X, y, k = 2, mtry= if (!is.null(y) && !is.factor(y))
+                        max(floor(ncol(X)/3), 1) else floor(sqrt(ncol(X))),
+    ntree = 500, nPerm = 1, parallel = FALSE, ncores = 0, seed = 123)
+    
+*X* :
+
+*y* :
+
+*k* :
+
+*mtry* :
+
+*ntree* :
+
+*nPerm* :
+
+*parallel* :
+
+*ncores* :
+
+*seed* :
+
+
+### 4.2.5 varSelRF() function :
+
+**Function call :**  
+
+varSelRF(xdata, Class, c.sd = 1, mtryFactor = 1, ntree = 5000, ntreeIterat = 2000, vars.drop.num = NULL, vars.drop.frac = 0.2,
+whole.range = TRUE, recompute.var.imp = FALSE, verbose = FALSE, returnFirstForest = TRUE, fitted.rf = NULL, keep.forest = FALSE)
+
+*xdata* :
+
+*Class* :
+
+*c.sd* :
+
+*mtryFactor* :
+
+*ntree* :
+
+*ntreeIterat* :
+
+*vars.drop.num* :
+
+*vars.drop.frac* :
+
+*whole.range* :
+
+*recompute.var.imp* :
+
+*verbose* :
+
+*returnFirstForest* :
+
+*fitted.rf* :
+
+*keep.forest* :
+
+
+
+### Summary 
+ 
+
+The following table displays the summary of each function presented above. 
+
+**Function name**|**main purpose**|**approach**|**Package**|
+----------|-------------|-------------------|-----------|
+
