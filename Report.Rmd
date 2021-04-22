@@ -267,7 +267,7 @@ The two previous functions allow to perform calculation to display and indicate 
 The following table displays the summary of each function presented above. 
 
 **Function name**|**main purpose**|**approach**|**Package**|
------------------|----------------|------------|-----------|
+----------|-------------|-------------------|-----------|
 importance()| variable importance estimate |Breaking the link between $X_j$ and $y$ by permutation of $x_j$ values for each observation in the data set|[randomForest](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf)|
 ||||
 varImpPlot()|Visualization| 2 graphs based on the type of error|[randomForest](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf)|
