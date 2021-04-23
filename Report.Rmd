@@ -2,7 +2,10 @@
 title: "Variable importance and selection using random forests"
 author: "Abderezzak Amimer , Madi Kassymbekov"
 date: "17/04/2021"
-output: pdf_document
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 ---
 
 ## 1. Presentation of the subject
@@ -276,7 +279,7 @@ vimp.rfsrc()|variable importance estimate|Three different approaches to estimate
 ||||
 holdout.vimp()|variable importance estimate|Holding out certain variables from the growing process and comparing the predictions to the ones made without holding them out|[randomForestSRC](https://cran.r-project.org/web/packages/randomForestSRC/randomForestSRC.pdf)|
 
-### 4.2 Variable selection packages
+### 4.2 Variable selection 
 
 For variable selection the following four main R packages will be considered.
 
@@ -288,25 +291,25 @@ The first one is the **Boruta** package developed by Kursa and Rudnicki (2010). 
 
 Boruta(x,y, pValue = 0.01, mcAdj = TRUE, maxRuns = 100, doTrace = 0, holdHistory = TRUE, getImp = getImpRfZ)
 
-*x* :
+*x* : Data frame of covariates.
 
-*y* :
+*y* : A vector of the response variable.
 
-*pValue* :
+*pValue* : Confidence level to perform the two sided test on the z score of variable importance comparison between the copied covariate and the original covariate valus. 
 
-*mcAdj* :
+*mcAdj* : If set to be true, a multiple comparison method using Bonferroni in order to adjust the p-values.
 
-*maxRuns* :
+*maxRuns* : The number of iterations of the algorithm. The algorithm stops when all variables are confirmed or the number of max runs is reached.
 
-*doTrace* :
+*doTrace* : verbosity level. 0 means no tracing, 1 means reporting decision about each attribute as soon as it is justified, 2 means the same as 1, plus reporting each importance source run, 3 means the same as 2, plus reporting of hits assigned to yet undecided attributes.
 
-*holdHistory* :
+*holdHistory* : if set to true, the full trace of importance calculations is stored and returned in the object ImpHistory. 
 
-*getImp* :
+*getImp* : Allows to get the variable importance calculated using the **getImpRfz** which gathers Z-scores of mean decreasing accuracy measures. 
 
-*formula* :
+*formula* : Alternatively, formula describing model to be analysed.
 
-*data* :
+*data* : Data set to use for the algorithm.
 
 ### 4.2.2 VSURF() function :
 
@@ -316,37 +319,37 @@ VSURF(x, y, ntree = 2000, mtry = max(floor(ncol(x)/3), 1), nfor.thres = 50, nmin
   nfor.interp = 25, nsd = 1, nfor.pred = 25, nmj = 1, RFimplem = "randomForest", parallel = FALSE, ncores = detectCores()- 1, 
   clusterType = "PSOCK", verbose = TRUE)
 
-*x or formula* :
+*x or formula* :	A data frame or a matrix of predictors, the columns represent the variables. Or a formula describing the model to be fitted
 
-*y* :
+*y* : A vector of the response variable for each instance. It has to be a factor for classification and numeric for regression.
 
-*mtry* :
+*mtry* : A subsample of covariates selected randomly as candidates at each split. It is the standard parameter of random forests.
 
-*nfor.thres* :
+*nfor.thres* : The number of forests grown for the first step of variable elimination.
 
-*nmin* :
+*nmin* : The coefficient by wich the minimal importance score is multiplied to set a threshold.
 
-*nfor.interp* :
+*nfor.interp* :The number of forests grown for the second step of variable elimination.
 
-*nsd* :
+*nsd* : Number of times the standard deviation of the minimum value of err.interp is multiplied. err.interp is obtained by adding the min error of step 1 plus the coefficient nsd selected by this argument times the standard deviation of the out of bag error at the second step of the algorithm explained above.
 
-*nfor.pred* :
+*nfor.pred* : The number of forests grown for the third step of variable elimination.
 
-*nmj* :
+*nmj* : Number of times the mean.jump is multipied. Which is calculated by taking the difference between OOB errors of one model and its first following model. 
 
-*RFimplem* :
+*RFimplem* : Choice of the package to use to fit the random forest. **randomForest** is set as the default option, but **ranger** and **Rborist**.
 
-*parallel* :
+*parallel* : If set to true, VSURF function will run on multuple cores or in parallel.
 
-*ncores* :
+*ncores* : Number of cores to use, the default value is set to the number of cores detected by R minus one.  
 
-*clusterType* :
+*clusterType* : Type of the multiple cores cluster used to run the function.
 
-*verbose* :
+*verbose* : If set to true, tracking of the progress will be printed in the console.
 
-*data* :
+*data* : The data frame containing the variables in the model.
 
-*na.action* :
+*na.action* : A function to specify the action to be taken if NAs are found. (NOTE: If given, this argument must be named, and as randomForest it is only used with the formula-type call.)
 
 ### 4.2.3 PIMP() function ;
 
@@ -354,19 +357,19 @@ VSURF(x, y, ntree = 2000, mtry = max(floor(ncol(x)/3), 1), nfor.thres = 50, nmin
 
 PIMP(X, y, rForest, S = 100, parallel = FALSE, ncores=0, seed = 123)
 
-*X* :
+*X* : A data frame or a matrix of predictors.
 
-*y* :
+*y* : A response vector. If the values are factor, the function assumes a classification task.
 
-*rForest* :
+*rForest* : randomForest must be used with the argument importance set to true. 
 
-*S* :
+*S* : The number of permutation to perform on the response vector.
 
-*parallel* :
+*parallel* : if set to true, the computation will be made in parallel.
 
-*ncores* :
+*ncores* : How many child processors will be run simultaneously. 
 
-*seed* :
+*seed* : seed for random number generator.
 
 ### 4.2.4 CVPVI() function :
 
@@ -376,23 +379,23 @@ CVPVI(X, y, k = 2, mtry= if (!is.null(y) && !is.factor(y))
                         max(floor(ncol(X)/3), 1) else floor(sqrt(ncol(X))),
     ntree = 500, nPerm = 1, parallel = FALSE, ncores = 0, seed = 123)
     
-*X* :
+*X* : A data frame or matrix of covariates.
 
-*y* :
+*y* : The response vector.
 
-*k* :
+*k* : The number of folds used for cross validation.
 
-*mtry* :
+*mtry* : Number of variables randomly sampled as candidates for each split for $I_{th}$ forest. The default values differ based on the nature of the task. For classification, it is $\sqrt(p)$ and for regression it is $p/3$ where $p$ is the number of covariates in the model.
 
-*ntree* :
+*ntree* : Number of trees to grow per forest.
 
-*nPerm* :
+*nPerm* : Number of times the $k_{th}$ data set are permuted per tree for assessing variable fold-specific permutation variable importance. Default is nPerm=1
 
-*parallel* :
+*parallel* : if set to true, the computation will be made in parallel.
 
-*ncores* :
+*ncores* : How many child processors will be run simultaneously. 
 
-*seed* :
+*seed* : seed for random number generator.
 
 
 ### 4.2.5 varSelRF() function :
@@ -402,34 +405,33 @@ CVPVI(X, y, k = 2, mtry= if (!is.null(y) && !is.factor(y))
 varSelRF(xdata, Class, c.sd = 1, mtryFactor = 1, ntree = 5000, ntreeIterat = 2000, vars.drop.num = NULL, vars.drop.frac = 0.2,
 whole.range = TRUE, recompute.var.imp = FALSE, verbose = FALSE, returnFirstForest = TRUE, fitted.rf = NULL, keep.forest = FALSE)
 
-*xdata* :
+*xdata* : A data frame of a matrix of covariates. Missing values are not allowed.
 
-*Class* :
+*Class* : The response variable must. 
 
-*c.sd* :
+*c.sd* : In the same idea of the 1SE rule, this factor multiplies the standard deviation error and ads it to the minimal error obtained to select the best model for variable selection. 
 
-*mtryFactor* :
+*mtryFactor* : The factor that multiplies the $\sqrt(p)$ to select the number of covariates to be candidates for each split in the **randomForest()** function. 
 
-*ntree* :
+*ntree* : The number of tree for the initial forest. 
 
-*ntreeIterat* :
+*ntreeIterat* : The number of tree to use for all additional forests.
 
-*vars.drop.num* :
+*vars.drop.num* : The number of variable to drop at each iteration.
 
-*vars.drop.frac* :
+*vars.drop.frac* : Instead of a number of variables to drop, this argument allows to specify a proportion of variables to drop.
 
-*whole.range* :
+*whole.range* : If set to true, the algorithm will keep dropping variables until only two are left and the model selects the best amongst all possible options. If false, the stopping criterion of c.sd error is respected.
 
-*recompute.var.imp* :
+*recompute.var.imp* : If set to true, the variable importance values will be recomputed at each iteration.
 
-*verbose* :
+*verbose* : If set to true, tracking of the progress will be printed in the console.
 
-*returnFirstForest* :
+*returnFirstForest* : If set to true, the first random forest fitted will be returned.
 
-*fitted.rf* :
+*fitted.rf* : A previously fitted random forest. (optional)
 
-*keep.forest* :
-
+*keep.forest* : Save the random forest.
 
 
 ### Summary 
@@ -439,4 +441,142 @@ The following table displays the summary of each function presented above.
 
 **Function name**|**main purpose**|**approach**|**Package**|
 ----------|-------------|-------------------|-----------|
+Boruta()|Variable selection for classification| This function follows the Boruta method which , in summary, consists of a top-down search for relevent features by comparing original attributes importance with importance achieved at random| [Boruta](https://cran.r-project.org/web/packages/Boruta/Boruta.pdf)|
+||||
+VSURF()|Variable selection for classification and regression with a step for interpretation|Three steps selection algorithm. The first steo eliminates irrelevant variables from the dataset. The second allows to keep the ones for interpretation and the last step is used to improve prediction performance.|[VSURF](https://cran.r-project.org/web/packages/VSURF/VSURF.pdf)|
+||||
+PIMP()|Variable selection for classification and regression| This function uses the Altmann's method to make variable selection. It permutes the response variable $y$ to break its links with covariates.|[VITA](https://cran.r-project.org/web/packages/vita/vita.pdf)|
+||||
+CVPVI()|Variable selection for classification and regression using cross-validation|This method splits the dataset into k sets of equal size and constructs the same number of random forests. In each fold, variable permutation is completed to break the link between $Y$ and $X$| [VITA](https://cran.r-project.org/web/packages/vita/vita.pdf)|
+||||
+varSelRF()|Variable selection for classification|Using the OOB error as minimization criterion, carry out variable elimination from random forest, by successively eliminating the least important variables (with importance as returned from random forest)|[varSelRF](https://cran.r-project.org/web/packages/varSelRF/varSelRF.pdf)|
+
+
+## 5. Guide on how to apply the previous methods and ressources for a regression and a classification task. 
+
+The previous sections allowed to detail the available ressources and methods used to compute and select the most important variables when it comes to fiting a random forest model. The next steps will provide an in depth turorial of these methods with concrete examples using simulated and real data.
+
+### 5.1 Data sets overview 
+Two data set will be explored and analysed in the following sections. First, for a classification task, the BreasCancer data will be used and second, for a regression task, the BostonHousing data will be used.
+
+### 5.1.1 BreastCancer data set description
+The first data set used is for a classification task and it is found in the mlbench package. The full description of the dataset can be  found in this link [**BreastCancer** DATA](https://cran.r-project.org/web/packages/mlbench/mlbench.pdf).
+
+To load the data set, first install and import the **mlbench** package. If these basic R steps are not familiar, the following web demonstration is an excellent guide for beginners in R studio. [**Datacamp**](https://www.datacamp.com/community/tutorials/r-packages-guide?utm_source=adwords_ppc&utm_campaignid=12492439676&utm_adgroupid=122563405841&utm_device=c&utm_keyword=load%20library%20r&utm_matchtype=b&utm_network=g&utm_adpostion=&utm_creative=504100768473&utm_targetid=aud-299261629574:kwd-385495694086&utm_loc_interest_ms=&utm_loc_physical_ms=9000471&gclid=Cj0KCQjwvYSEBhDjARIsAJMn0lhJHKLri-WYwC3QEbn4m4gcMp0gXBWl4SMWwhuAuDktmeOj3mIunygaAs8nEALw_wcB)
+
+The following block of code allows to install and load the dataset.
+
+```{r Loading Breast cancer data , warning=FALSE , tidy=TRUE}
+#Loading the already installed libray containing the dataset.
+library("mlbench")
+
+# Loading the dataset from mlbench package.
+data("BreastCancer")
+
+# removing instances with missing values
+BreastCancer <- na.omit(BreastCancer)
+
+# Summary of breast cancer type in the dataset
+summary(BreastCancer$Class)
+```
+
+The data set contains `r ncol(BreastCancer)` variables amongst which "class" is a binary variable defined by benign cancer and malignant cancer. Using the `r ncol(BreastCancer) - 1` covariates, the goal is to predict, for new instances, in which class they belong. There are `r nrow(BreastCancer)` observations.
+
+### 5.1.2 Bostonhousing data set description
+
+The following block of code allows to load it.
+
+```{r BostonHousing data set , warning=FALSE , tidy=TRUE , digits = 4}
+data("BostonHousing2")
+
+#The dataset description indicates that medv is incorret and cmedv should be used.
+BostonHousing2$medv <- NULL
+
+#Some variables represent the exact informatio. Tract , town , lon and lat. 
+#They all refer to the geographical location of the how in question.
+#Only lon and lat will be kept as they are numerical values. The others are 
+#character values.
+BostonHousing2$town <- NULL
+BostonHousing2$tract <- NULL
+```
+
+The second data set is also found in the **mlbench** package. This set is going to be used for a regression task. The goal is to adequately predict the median value of owner-occupied homes in 1970 around the Boston area. The dataset contains `r ncol(BostonHousing2) - 1` covariates and `r nrow(BostonHousing2)` observations.
+
+### 5.1.3 Train and test set splitting
+In order to perform the analsis require to compare model performance, it is important to split the data between training and test sets. 20% of the data sets will be used to estimate generalization error.
+
+```{r Test and train split , warning=FALSE , tidy=TRUE , digits = 4}
+#classification data
+set.seed(12345)
+index = sort(sample(nrow(BreastCancer), nrow(BreastCancer)*.8))
+train_class = BreastCancer[index , ]
+test_class = BreastCancer[-index , ]
+
+#Regression data
+set.seed(12345)
+index = sort(sample(nrow(BostonHousing2), nrow(BostonHousing2)*.8))
+train_reg = BostonHousing2[index , ]
+test_reg = BostonHousing2[-index , ]
+```
+
+### 5.2 Fitting a regular random forest without variable selection
+
+To estimate variable importance, some methods require fitting a random forest before passing the data into the specific function allowing to do so. This initial section is dedicated to a simple random forest model without variable selection. It will help validate wether the variable selection approach is improving the quality of the predictions or if the variable selection methods decrease the overall prediction. In other words, this helps setting a benchmark for comparison. For the scope of the project, hyperparameters will be fixed from the start in order to compare the different methods with everything being equal except, the intrinsic algorithm used to perform variable selection.
+
+The first model to be fit is on the BreastCancer data and the good classification rate will be reported.
+
+```{r Benchmark for classification , warning=FALSE , tidy=TRUE  , digits = 4 }
+#First load the package
+library("randomForest")
+
+#Fitting the randomForest, note that importance is set as true for future reference.
+rf_class <- randomForest(Class ~ . - Id, data = train_class , importance = TRUE )
+
+#Predicting on the test set
+pred_bench_class <- predict(rf_class , newdata = test_class , type = "response")
+
+#good classification rate
+Bench_class <- length(which(pred_bench_class == test_class$Class )) / nrow(test_class)
+
+#Confusion matrix below present the results of the classification task
+c_mat_1 <- table(pred_bench_class , test_class$Class)
+```
+
+The second model to fit is the on BostonHousing and the mean squared error with the mean absolute error will be reported.
+
+```{r Benchmark for regression , warning=FALSE , tidy=TRUE , digits = 4}
+#Fitting the random forest 
+rf_reg <- randomForest(cmedv~. , data=train_reg , importance = TRUE) 
+
+pred_bench_reg <- predict(rf_reg , newdata = test_reg , type="response" )
+
+MSE_bench <- mean((pred_bench_reg - test_reg$cmedv)^2)
+MAE_bench <- mean(abs(pred_bench_reg - test_reg$cmedv))
+```
+
+The good classification rate obtained using the default parameters of the random forest is `r format(Bench_class , digits = 4)`. 
+
+On the other hand, the mean squared error for the regression task is `r format(MSE_bench , digits = 4)` and the mean absolute error is `r format(MAE_bench, digits = 4)`. 
+
+### 5.3 Estimation of variable importance 
+
+Once a model is fit, a user could be interested in determining which variable was the most influent in predicting the response. The following block of code demonstrates how to estimate variable importance in both the classification task and the regression task.
+
+### 5.3.1 Estimating importance function from randomForest package
+
+The required package is already installed and loaded from the previous code chunk used to fit the different forests. First, the importance function will be used to estimate variable importance and second, it will be ploted to help visualize the results.
+
+Before computing importance, it is crucial to indicate that to fully take advantage of the functions presented to estimate these values, the user has to select the *importance* argument in the randomForest function as true.
+
+```{r randomForest importance , warning=FALSE , tidy=TRUE , digits = 4 }
+# Computing using mean decrease in accuracy 
+imp_class_1 <- importance(rf_class , type = 1 , scale = TRUE )
+
+# Computing using mean decrease in node impurity
+imp_class_2 <- importance(rf_class , type = 2 , scale = TRUE)
+
+# Visualing the results using the plot function most important and the three least important.
+varImpPlot(rf_class , sort = TRUE , n.var = 5 , main = "Variable Importance" , scale = TRUE)
+```
+
 
