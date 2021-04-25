@@ -10,49 +10,47 @@ output:
 
 ## 1. Presentation of the subject
 
-This project is intended in proposing a tutorial for variable importance and variable selection in random forests using different R resources. The methods used in the following sections are purely designed for prediction setting and not an inference one. Before diving into the tutorial, each element discussed are briefly reviewed.
+This project is intended in proposing a tutorial for variable importance and variable selection in random forests using different R resources. The methods used in the following sections are purely designed for a prediction setting and not an inference.
 
 ### 1.3 Random Forests 
-Random forests are in the family of ensemble methods. The principle is fairly simple. It combines many regression or classification trees using several bootstrap samples from the training data and randomly selecting a subset of the explanatory variables at each node in order to split the data. Amongst the random subset, one is selected using CART or Inference method to split. Additional details will be provided on this matter and these very powerful algorithms.
+Random forests are in the family of ensemble methods. The principle is fairly simple. It combines many regression or classification trees using several bootstrap samples from the training data and randomly selecting a subset of the explanatory variables at each node in order to split the data. Amongst the random subset, one variable is selected using CART or Inference method to split instances. Once each tree is fully grown, predictions are made by taking the average of all trees in the forest.
 
 ### 1.1 Variable importance 
-Variable importance can be defined as the contribution of each predictor to the model. It is usually represented as a ranking of the variables based on the effect they have on the generated model. Knowing which variables significantly impacts the quality of the predictions helps analysts weed out those that are not necessary and help , in certain cases, improve the quality of the predictions.
+Variable importance can be defined as the contribution of each predictor to the model. It is usually represented as a ranking of the variables based on the effect they have on response variable studied. Knowing which variables significantly impacts the quality of the predictions helps analysts weed out those that are not necessary and help , in certain cases, improve the quality of the predictions.
 
 ### 1.2 Variable selection 
-Variable selection consists of removing certain predictors from a model in order to improve the quality of a prediction. Following Kohavi and John (1997) and Guyon and Elisseff (2003), three groups of methods are distinguishable. First, "wrapper", which look closely at the prediction performance of a model to make variable selection. Second, "filter", the score of variable importance is not based on a model design and finally, "embedded" which combines both model estimation and variable selection.
+Variable selection consists of removing certain predictors from a model in order to improve the quality of a prediction. Following Kohavi and John[1] and Guyon and Elisseff (2003)[2], three groups of methods are distinguishable. First, "wrapper", which looks closely at the prediction performance of a model to make variable selection. Second, "filter", the score of variable importance is not based on a model design and finally, "embedded" which combines both model estimation and variable selection.
 
 
 ### Outline 
-This project is organized as follows. A description of important literature and the most recent algorithms used in R regarding variable importance and selection using trees. Next, an overview of the methods to be used in the tutorials. To continue, a section will be dedicated to review R resources that will be used on a simulated data set.This last part will be a demonstration of how to perform variable selection and variable importance using the references presented in the appropriate sections.
+This project is organized as follows. A description of important literature and the most recent algorithms used in R regarding variable importance and selection using trees. Next, an overview of the methods to be used in the tutorials. To continue, a section will be dedicated to review R resources that will be used on data sets found in different R libraries to which noise was added.This last part will be a demonstration of how to perform variable selection and compute variable importance using the references presented.
 
 \newpage 
 
 ## 2. Literature review
 
 ### 2.1 Random forest 
-Random forests are based on decision trees with bootstrap aggregation called "bagging". It is a method used to generate multiple versions of a predictor to get an average predictor. Randomness is introduced in each predictor by making bootstrap replicates. As low bias is the feature of tree based models, high variance is one of its drawbacks dependent on the number of features that leads to larger trees and potential vulnerability to over fitting. However, compared to other tree models like CART and conditional inference tree, random forest models use bootstrap aggregation technique with random features to do prediction and afterwards uses weighted averaging which lowers the variance of predictions compared to classical decision tree models. The algorithm could be summarized by the following pseudo code Breiman  (2001) : 
+Random forests are based on decision trees with bootstrap aggregation called "bagging". It is a method used to generate multiple versions of a predictor to get an average predictor. Randomness is introduced in each predictor by making bootstrap replicates. As low bias is the feature of tree based models, high variance is one of its drawbacks dependent on the number of features that leads to larger trees and potential vulnerability to over fitting. However, compared to other tree models like CART and conditional inference tree, random forest models use bootstrap aggregation technique with random features to do prediction and afterwards uses weighted averaging which lowers the variance of predictions compared to classical decision tree models. The algorithm could be summarized by the following pseudo code of Breiman  (2001)[3] : 
 
 1) For a training set of length N, sample N instances at random with replacement.
 2) Grow a tree on the bootstrap training set using a specified number of random features.
 3) Repeat step 1 and 2 for the set number of estimators.
 4) Average predictions or take majority vote (depending on type of task).
 
-
-
 ### 2.2 Variable importance
+Variable importance calculations are based the link that a predictor has with the response variable. Due to the nature of random forest algorithms, it's value can depend on certain hyperparameters. The essential ones are discussed here.
 
 #### Sensitivity to n and p 
-All learners are sensitive to the nature of the data and it's quality. Two important components to consider when fitting a model is the number of observations $n$ and the number of explanatory variables $p$. Genuer et al. (2010) ran an experiment using simulated data to understand how the variable importance index would vary when $n << p$. It was shown that as $n$ decreases and becomes smaller compared to $p$, the variable importance index of significant variables would decrease and get closer to 0. The variability of the index also increases greatly and that is due to the intrinsic algorithm of random forests. 
+All learners are sensitive to the nature of the data and it's quality. Two important components to consider when fitting a model is the number of observations $n$ and the number of explanatory variables $p$. Genuer et al. (2010)[4] ran an experiment using simulated data to understand how the variable importance index would vary when $n << p$. It was shown that as $n$ decreases and becomes smaller compared to $p$, the variable importance index of significant variables would decrease and get closer to 0. The variability of the index also increases greatly and that is due to the intrinsic algorithm of random forests. 
 
 #### Sensitivity to mtry and ntree 
-Mtry hyper parameter in the random forest algorithm is defined as the subset of covariates in the data that is used to perform the best split at different nodes. According to Genuer et al. (2010), the increase of the number of variables in the subset leads to an increase in the magnitude of variable importance index of useful predictors. On the other hand, ntree, an other hyper parameter of the random forest algorithm, is defined as the number of trees. It's increase leads to a decrease of the standard deviation of the variable importance index. It is important to note, that although the standard deviation decreases, using a large number of trees can prompt over fitting on the training data.
+Mtry hyper parameter in the random forest algorithm is defined as the subset of covariates in the data that is used to perform the best split at different nodes. According to Genuer et al. (2010)[4], the increase of the number of variables in the subset leads to an increase in the magnitude of variable importance index of useful predictors. On the other hand, ntree, an other hyper parameter of the random forest algorithm, is defined as the number of trees. It's increase leads to a decrease of the standard deviation of the variable importance index. It is important to note, that although the standard deviation decreases, using a large number of trees can prompt over fitting on the training data.
 
 #### Sensitivity to correlated covariates 
-Many studies were performed to evaluate the impact of having correlated covariates on the variable importance index. Archer and Kimes (2008) paper indicates that the increase in the number of correlated covariates makes it difficult to pick significant variables due to the dilution of the variable importance score which is confirmed by the experiments of Auret and Aldrich (2011).
+Many studies were performed to evaluate the impact of having correlated covariates on the variable importance index. Archer and Kimes (2008)[5] paper indicates that the increase in the number of correlated covariates makes it difficult to pick significant variables due to the dilution of the variable importance score which is confirmed by the experiments of Auret and Aldrich (2011)[6].
 
 ### 2.3 Variable selection 
 In this project, the focus will be put on the "wrapper" methods which base the variable selection on a score that includes the prediction performance. Usually, the performance measure used is the mean squared error for regression tasks and the misclassification rate for classification tasks. 
-
 
 ## 3. Brief review of methods 
 In the following section, a brief description of the methods used to calculate variable importance and to perform relevant variable selection will be presented.
@@ -63,7 +61,7 @@ In the following section, a brief description of the methods used to calculate v
  
 First we start with variable importance calculation as it is the main index used to perform variable selection using random forests.
 
-The idea behind this measure is that a covariate $X$ is important if the prediction error increases when the relationship between $X$ and $Y$ is modified. To illustrate how to calculate the variable importance once can simply follow these steps for the classical approach which is presented by Breiman (2001)
+The idea behind this measure is that a covariate $X$ is important if the prediction error increases when the relationship between $X$ and $Y$ is modified. To illustrate how to calculate the variable importance one can simply follow these steps for the classical approach which is presented by Breiman (2001)[3].
 
 1) Fit a random forest on the training data.
 2) Select an out of bag sample of observations that the model was not trained on (OOB) and calculate the mean squared error on each tree.
@@ -72,7 +70,7 @@ The idea behind this measure is that a covariate $X$ is important if the predict
 5) Perform the steps 3 and 4 for each covariate in the covariate space.
 6) To calculate the variable importance, the sum of differences of the MSE between the permuted covariate and the non permuted covariate is taken and divided by the total number of OOB.
 
-The following formula displays the results of this algorithm : 
+The following formula displays how to calculate variable importance : 
 
 $$VIMP(X_j) = \frac{1}{B}\sum_{b=1}^B[MSE(\hat{f}_b , OOB_b^j) -MSE(\hat{f}_b , OOB_b)] $$
 where 
@@ -83,11 +81,22 @@ $\hat{f}_b$ is the prediction model for the $b_{th}$ sample.
 
 ### Node assignment variation approach 
 
-Isharwan H. (2007) proposed a different way of breaking the link between $Y$ and $X$. Instead of permuting the values of $X_j$ they proposed to assign the node at random instead of choosing the best variable to split on. The second option, consists of systematically choosing the opposite split each time a split is performed with that variable. This adds noise to the model and the error is then used to calculate the difference in error with the original model.
+Ishwaran H. (2007)[7] proposed a different way of breaking the link between $Y$ and $X$. Instead of permuting the values of $X_j$ they proposed to assign the node at random instead of choosing the best variable to split on. The second option, consists of systematically choosing the opposite split each time a split is performed with that variable. This adds noise to the model and the error is then used to calculate the difference in error with the original model.
 
 ### Holdout approach 
 
-Isharwan H. (2007) also proposed a second method to estimate the importance of a variable when it comes to predict the response by holding out a group of variables when growing trees and comparing the OOB errors on the different forests when the group is held out vs when it's not. 
+Ishwaran H. (2007)[7] also proposed a second method to estimate the importance of a variable when it comes to predict the response by holding out a group of variables when growing trees and comparing the OOB errors on the different forests when the group is held out vs when it's not.
+
+#### Altmann 
+Altmann (2010)[8] method is based on an approach that keeps the values and the correlation structure of the  covariates intact while computing variable importance under a null hypothesis of no association between predictor and the response variable. Instead of permuting the values of $X_j$, it permutes the values of the outcome and then multiple random forests are trained and new variable importance are calculated. If the variable importance in the original model without permutation is significantly different than 0, then the variable is kept. Otherwise, it is deemed as non-important and can be discarded from the model. This initial approach is called the permutation approach and is a basic method. Altmann's modifications are implemented with the distribution of the variable importance under the null hypothesis. In other words, in order to allow less training of random forests and to get a conclusive test, it is important to make the right assumptions on the variable importance distribution and the author of the described method allows a parametric approach to estimate the P-values by fitting a specific probability distribution such as a normal, a log-normal etc.
+
+#### Recurrent relative variable importance
+This approach is used in case the number of unimportant variables in a data set is large proposed by Szymczak et al (2016)[9]. The selection method is simply based on a ratio of different random forest fits. In other words, first, several random forests are generated based on the data set and parameter values differing only in the seed of the random number generating process. Each random forest is used to compute the variable importance using the classical method and the values obtained are divided by the absolute minimum importance observed in each run. This outputs relative values and each variable having an importance greater or equal to a predetermined factor is kept.
+
+#### Cross-validated permutation variable importance
+This method randomly splits the data set into k sets of equal size. The method constructs k random forests, where the l-th forest is constructed based on observations that are not part of the l-th set. For each forest the fold-specific permutation variable importance measure is computed using all observations in the l-th data set: For each tree, the prediction error on the l-th data set is recorded. Then the same is done after permuting the values of each predictor variable.
+
+The differences between the two prediction errors are then averaged over all trees. The cross-validated permutation variable importance is the average of all k-fold-specific permutation variable importances. For classification the mean decrease in accuracy over all classes is used and for regression the mean decrease in MSE. This method is proposed by Janitza et al.(2015)[10].
 
 ### 3.2 Variable selection methods
 
@@ -102,13 +111,13 @@ RFE's objective is to find the smallest number of variables that help to get the
 3. Eliminate the less relevant variable(s).
 4. Repeat steps 1 to 3 until no further variables remain.
 
-This method is an improved version of the NRFE, which was proven to be less efficient on correlated data. The update of the ranking based on variable importance has proven to be more effective in presence of correlation withing the covariates. For that reason, NRFE will not be used in the following tutorials (Gregorutti et al (2016)).
+This method is an improved version of the NRFE, which was proven to be less efficient on correlated data. The update of the ranking based on variable importance has proven to be more effective in presence of correlation withing the covariates. For that reason, NRFE will not be used in the following tutorials (Gregorutti et al (2017)[11]).
 
 #### Boruta
 
-This method was developed to find all relevant variables within a classification framework. Kursa and Rudnicki (2010) described the Boruta algorithm with the following steps:
+This method was developed to find all relevant variables within a classification framework. Kursa and Rudnicki (2010)[12] described the Boruta algorithm with the following steps:
 
-The Boruta algorithm consists of following steps:
+The Boruta algorithm consists of the following steps:
 1. Extend the training data by adding copies of all variables (the data is always extended by at least 5 duplicate attributes, even if the number of attributes in the original set is lower than 5).
 
 2. Shuffle the added attributes to remove their correlations with the response.The goal here is to break the link between $Y$ and $X$.
@@ -130,11 +139,11 @@ algorithm has reached the previously set limit of the random forest runs.
 
 
 #### Vsurf
-The Vsurf method is both useful in regression and classification tasks. It is also used for interpretation and prediction. The algorithm in question is performed in two different steps and it is described as follows (Genuer et al. (2015)).
+The Vsurf method is both useful in regression and classification tasks. It is also used for interpretation and prediction. The algorithm in question is performed in two different steps and it is described as follows (Genuer et al. (2015)[13]).
 
 Step 1 : Preliminary ranking and elimination. 
 
-a) This step consists of ranking the variables using the classical variable importance index. Genuer et al.(2015) suggests using a typical 50 trees to estimate the variable importance index.
+a) This step consists of ranking the variables using the classical variable importance index. Genuer et al.(2015)[13] suggests using a typical 50 trees to estimate the variable importance index.
 
 b) Based on a certain threshold, eliminate all variables for which the variable importance index is below the threshold. The threshold in question is estimated by calculating the standard deviation of variable importance. Other strategies could be used to find the best threshold.
 
@@ -146,22 +155,12 @@ The algorithm uses a very simple method to select the most performing model. For
 b) For prediction.
 In order to improve the prediction performance, start with the ordered sequence of variables selected in the interpretation step. From there, build different random forests by following the order of variable importance from the previous step and use a step wise algorithm to eliminate variables that increase the OOB prediction error by a previously selected threshold.
 
-#### Jefferie S. Evans et al. method for model selection (Parsimony)
+#### Jefferie S. Evans et al.(2015)[14] method for model selection (Parsimony)
 The purpose of the authors of the following method was to simplify as much as possible the complexity of the models. They used the permuted variable importance measure to do so. The method starts by fitting a random forest with all variables and estimates variable importance. The values are then ranked and standardized to a certain ratio. Then, it alliteratively subsets variables within a given ratio and fitting a model for each subset. The resulting model is compared to the original model which is kept constant. The performance is calculated on the OOB error which can include a penalty for the number of parameters in order to reduce the complexity of the model.
 
-#### Altmann 
-Altmann's method is based on an approach that keeps the values and the correlation structure of the  covariates intact while computing variable importance under a null hypothesis of no association between predictor and the response variable. Instead of permuting the values of $X_j$, it permutes the values of the outcome and then multiple random forests are trained and new variable importance are calculated. If the variable importance in the original model without permutation is significantly different than 0, then the variable is kept. Otherwise, it is deemed as non-important and can be discarded from the model. This initial approach is called the permutation approach and is a basic method. Altmann's modifications are implemented with the distribution of the variable importance under the null hypothesis. In other words, in order to allow less training of random forests and to get a conclusive test, it is important to make the right assumptions on the variable importance distribution and the author of the described method allows a parametric approach to estimate the P-values by fitting a specific probability distribution such as a normal, a log-normal etc.
-
-#### Recurrent relative variable importance
-This approach is used in case the number of unimportant variables in a data set is large. The selection method is simply based on a ratio of different random forest fits. In other words, first, several random forests are generated based on the data set and parameter values differing only in the seed of the random number generating process. Each random forest is used to compute the variable importance using the classical method and the values obtained are divided by the absolute minimum importance observed in each run. This outputs relative values and each variable having an importance greater or equal to a predetermined factor is kept.
-
-#### Cross-validated permutation variable importance for variable selection
-This method randomly splits the data set into k sets of equal size. The method constructs k random forests, where the l-th forest is constructed based on observations that are not part of the l-th set. For each forest the fold-specific permutation variable importance measure is computed using all observations in the l-th data set: For each tree, the prediction error on the l-th data set is recorded. Then the same is done after permuting the values of each predictor variable.
-
-The differences between the two prediction errors are then averaged over all trees. The cross-validated permutation variable importance is the average of all k-fold-specific permutation variable importances. For classification the mean decrease in accuracy over all classes is used and for regression the mean decrease in MSE (Janitza et al.(2015)).
 
 ## 4. Review of R resources 
-For each method listed above, the following section will provide a detailed overview of R resources allowing to perform the algorithms in question.
+The following section will provide a detailed overview of R resources implemented to perform algorithms that helps to estimate variable importance in random forests and to make variable selection.
 
 ### 4.1 Variable importance packages
 To calculate variable importance, two main packages are picked for comparison.
@@ -237,6 +236,7 @@ vimp.rfsrc(object, xvar.names, m.target = NULL, importance = c("permute", "rando
 
 *do.trace* : To print the estimated time of completion. 
 
+
 ### 4.1.4 holdout.vimp()  
 
 **Function call :**  
@@ -263,6 +263,10 @@ holdout.vimp(formula, data, ntree = function(p, vtry){1000 * p / vtry}, nsplit =
 
 *block.size* : If block.size can be set from 1 to ntree. When set to ntree, comparison of OOB error will be made on the ensemble forest. On the other hand, if block.size is set to 1, though OOB error is calculated by tree. Smaller values lead to better accuracy, but require more computation time. The user can make a compromise by selecting different block sizes.
 
+Other packages are developped to make variable importance estimation but are less popular. **Vita** is one of them and contains two variable importance functions.
+
+The first one is **PIMP** and it is based on Altmann's method.
+
 ### 4.1.5 :  PIMP() function 
 
 **Function call :**  
@@ -282,6 +286,8 @@ PIMP(X, y, rForest, S = 100, parallel = FALSE, ncores=0, seed = 123)
 *ncores* : How many child processors will be run simultaneously. 
 
 *seed* : seed for random number generator.
+
+The second function implemented in **VITA** is **CVPVI** which is a cross validation approach.
 
 ### 4.1.6 :  CVPVI() function 
 
@@ -312,7 +318,9 @@ CVPVI(X, y, k = 2, mtry= if (!is.null(y) && !is.factor(y))
 
 ### Summary 
  
-The two previous functions allow to perform calculations to display and indicate which covariates are the most useful in predicting the response variable. The **importance** function in the **randomForest** offers a simple way to get the details and it's usage is very straightforward. Thanks to the function **varImpPlot()** the user can easily display the result of their findings. On the other hand, the **vimp.rfsrc()** function from the **randomforestSRC** package offers much more flexibility and user parametrization. One of the most interesting features is the possibility to select the type of importance measure to compute and the number of trees used to obtain the OOB error comparison. Also, allowing for such customization in the function helps the user to alter the computation speed. For example, the analyst desiring to find out the importance of a group of variables could use the *joint* and specify those variable in the *x.var* argument to accelerate the process. Such flexibility is not offered in the **importance()** function. The last function covered for variable importance is the **holdout.vimp()** from the same package which offers important flexibility as well. The calculation methods are very different from one another and results for the latter function require a large number of trees in order to lower the variance of the importance estimates.
+We presented 6 functions for variables importance and they can all help distinguish wich covariates are the most useful. In the following sections, where the functions are applied to data sets, only **importance** , **vimp** and **holdout.vimp** will be demonstrated since they perform the most commonly used algorithms and have been tested rigorously.
+
+The thre previous functions retained allow to perform calculations to display and indicate which covariates are the most useful in predicting the response variable. The **importance** function in the **randomForest** offers a simple way to get the details and it's usage is very straightforward. Thanks to the function **varImpPlot()** the user can easily display the result of their findings. On the other hand, the **vimp.rfsrc()** function from the **randomforestSRC** package offers much more flexibility and user parametrization. One of the most interesting features is the possibility to select the type of importance measure to compute and the number of trees used to obtain the OOB error comparison. Also, allowing for such customization in the function helps the user to alter the computation speed. For example, the analyst desiring to find out the importance of a group of variables could use the *joint* and specify those variable in the *x.var* argument to accelerate the process. Such flexibility is not offered in the **importance()** function. The last function covered for variable importance is the **holdout.vimp()** from the same package which offers important flexibility as well. The calculation methods are very different from one another and results for the latter function require a large number of trees in order to lower the variance of the importance estimates.
 
 The following table displays the summary of each function presented above. 
 
@@ -332,7 +340,7 @@ CVPVI()|Variable selection for classification and regression using cross-validat
 
 ### 4.2 Variable selection 
 
-For variable selection the following four main R packages will be considered.
+For variable selection the following thre main R packages will be considered.
 
 The first one is the **Boruta** package developed by Kursa and Rudnicki (2010). The main function for variable selection here is **Boruta** which applies the Boruta algorithm mentioned previously for variable selection.
 
@@ -452,12 +460,12 @@ VSURF()|Variable selection for classification and regression with a step for int
 varSelRF()|Variable selection for classification|Using the OOB error as minimization criterion, carry out variable elimination from random forest, by successively eliminating the least important variables (with importance as returned from random forest)|[varSelRF](https://cran.r-project.org/web/packages/varSelRF/varSelRF.pdf)|
 
 
-## 5. Guide on how to apply the previous methods and ressources for a regression and a classification task. 
+## 5. Guide on how to apply the previous methods and resources for a regression and a classification task. 
 
-The previous sections allowed to detail the available ressources and methods used to compute and select the most important variables when it comes to fiting a random forest model. The next steps will provide an in depth turorial of these methods with concrete examples using simulated and real data.
+The previous sections allowed to detail the available resources and methods used to compute and select the most important variables when it comes to fitting a random forest model. The next steps will provide an in-depth tutorial of these methods with concrete examples using simulated and real data.
 
 ### 5.1 Data sets overview 
-Two data set will be explored and analysed in the following sections. First, for a classification task, the BreasCancer data will be used and second, for a regression task, the BostonHousing data will be used.
+Two data sets will be explored and analysed in the following sections. First, for a classification task, the BreasCancer data will be used and second, for a regression task, the BostonHousing data will be used.
 
 ### 5.1.1 BreastCancer data set description
 The first data set used is for a classification task and it is found in the mlbench package. The full description of the dataset can be  found in this link [**BreastCancer** DATA](https://cran.r-project.org/web/packages/mlbench/mlbench.pdf).
@@ -503,7 +511,7 @@ BostonHousing2$tract <- NULL
 The second data set is also found in the **mlbench** package. This set is going to be used for a regression task. The goal is to adequately predict the median value of owner-occupied homes in 1970 around the Boston area. The dataset contains `r ncol(BostonHousing2) - 1` covariates and `r nrow(BostonHousing2)` observations.
 
 ### 5.1.3 Train and test set splitting
-In order to perform the analsis require to compare model performance, it is important to split the data between training and test sets. 20% of the data sets will be used to estimate generalization error.
+In order to perform the required analysis to compare model performance, it is important to split the data between training and test sets. 20% of the data sets will be used to estimate generalization error.
 
 ```{r Test and train split , warning=FALSE , tidy=TRUE , digits = 4}
 #classification data
@@ -521,7 +529,7 @@ train_reg = BostonHousing2[index , ]
 test_reg = BostonHousing2[-index , ]
 ```
 
-To make a better assement of the ability of these methods to detect unimportant variables, some noise variables will be added.
+Also, to make a better assessment of the ability of these methods to detect unimportant variables, some noise variables will be added.
 
 ```{r adding noise to the datasets}
 #Generating noise variables
@@ -538,11 +546,11 @@ for ( i in 1: num_noise_var) {
 
 ### 5.2 Fitting a regular random forest without variable selection
 
-To estimate variable importance, some methods require fitting a random forest before passing the data into the specific function allowing to do so. This initial section is dedicated to a simple random forest model without variable selection. It will help validate wether the variable selection approach is improving the quality of the predictions or if the variable selection methods decrease the overall prediction. In other words, this helps setting a benchmark for comparison. For the scope of the project, hyperparameters will be fixed from the start in order to compare the different methods with everything being equal except, the intrinsic algorithm used to perform variable selection.
+To estimate variable importance, some methods require fitting a random forest before passing the data into the specific function allowing to do so. This initial section is dedicated to a simple random forest model without variable selection. It will help validate whether the variable selection approach is improving the quality of the predictions or if the variable selection methods decrease the overall prediction accuracy. In other words, this helps setting a benchmark for comparison. For the scope of the project, hyperparameters will be fixed from the start in order to compare the different methods with everything else being equal except, the intrinsic algorithm used to perform variable selection.
 
 The first model to be fit is on the BreastCancer data and the good classification rate will be reported.
 
-```{r Benchmark for classification , warning=FALSE , tidy=TRUE  , digits = 4 }
+```{r Benchmark for classification , warning=FALSE , message=FALSE }
 #First load the package
 library("randomForest")
 
@@ -559,9 +567,9 @@ Bench_class <- length(which(pred_bench_class == test_class$Class )) / nrow(test_
 c_mat_1 <- table(pred_bench_class , test_class$Class)
 ```
 
-The second model to fit is the on BostonHousing and the mean squared error with the mean absolute error will be reported.
+The second model to fit is on the BostonHousing and the mean squared error with the mean absolute error will be reported.
 
-```{r Benchmark for regression , warning=FALSE , tidy=TRUE , digits = 4}
+```{r Benchmark for regression , warning=FALSE , message= FALSE}
 #Fitting the random forest 
 rf_reg <- randomForest(cmedv~. , data=train_reg , importance = TRUE) 
 
@@ -577,7 +585,7 @@ On the other hand, the mean squared error for the regression task is `r format(M
 
 ### 5.3 Estimation of variable importance 
 
-Once a model is fit, a user could be interested in determining which variable was the most influent in predicting the response. The following block of code demonstrates how to estimate variable importance in both the classification task and the regression task.
+Once a model is fit, a user could be interested in determining which variable was the most influent in predicting the response. The following section demonstrates how to estimate variable importance in both the classification task and the regression task.
 
 ### 5.3.1 Estimating importance function from randomForest package
 
@@ -585,22 +593,24 @@ The required package is already installed and loaded from the previous code chun
 
 Before computing importance, it is crucial to indicate that to fully take advantage of the functions presented to estimate these values, the user has to select the *importance* argument in the randomForest function as true.
 
-```{r randomForest importance , warning=FALSE , tidy=TRUE , fig.height= 3 , fig.align="center"}
+```{r randomForest importance , warning=FALSE , message=FALSE , fig.height= 3 , fig.align="center" , fig.width=10 , fig.cap="The variable importance calculated here are both from the importance function."}
+
 # Computing using mean decrease in accuracy 
 imp_class_1 <- importance(rf_class , type = 1 , scale = TRUE )
 
 # Computing using mean decrease in node impurity
 imp_class_2 <- importance(rf_class , type = 2 , scale = TRUE)
 
-# Visualing the results using the plot function most important and the three least important.
+# Visualing the results using the plot function most important.
+par(cex.main = 0.8 , cex.axis = 0.8 , cex.lab = 0.8 , cex.main = 0.8)
 varImpPlot(rf_class , sort = TRUE , n.var = 5 , 
            main = "Variable importance : classification task" , 
            scale = TRUE)
 ```
-This previous figure displays the top five important variables based on the error decrease selected. On the left graph, type = 1 is chosen. The graph on the right, on the other hand uses type=2. Both methods selected the same four variables except for cell thickness which was only selected by the mean decrease in accuracy and normal nucleoli, which was only selected by the mean decrease in gini index. Although the method use the same algorithm, the simple modification in the type of error calculated leads to different results.
+This previous figure displays the top five important variables based on the error decrease selected. On the left graph, type = 1 is chosen. The graph on the right, on the other hand uses type=2. Both methods selected the same four variables except for cell thickness which was only selected by the mean decrease in accuracy and normal nucleoli, which was only selected by the mean decrease in gini index. Although the method use the same algorithm, the simple modification in the type of error calculated leads to different results. 
 
 For the regression task, the same steps can followed in order to obtain the needed measure.
-```{r Variable importance for the regression case , tidy=TRUE , fig.height= 3 , fig.align="center"} 
+```{r Variable importance for the regression case , tidy=TRUE , fig.height= 3 , fig.align="center" , fig.width=10 , fig.cap="Like the previous figure, this displays the results from the VarImpPlot function."} 
 
 # Computing variable importance for regression task : increase in MSE
 imp_reg_1 <- importance(rf_reg , type = 1 , scale = TRUE)
@@ -609,17 +619,20 @@ imp_reg_1 <- importance(rf_reg , type = 1 , scale = TRUE)
 imp_reg_2 <- importance(rf_reg , type = 2 , scale = TRUE)
 
 # Plotting the results
+par(cex.main = 0.8 , cex.axis = 0.8 , cex.lab = 0.8 , cex.main = 0.8)
 varImpPlot( rf_reg , n.var = 5 , main = "Variable importance : regression task" , 
             scale = TRUE)
 ```
 
-For this task, the two methods agree on the first three variables, but not on the 4th and 5th. A more exhaustive comparison will be provided at the end of this section.
+For this task, the two methods agree on the first three variables, but not on the 4th and 5th.
 
-### 5.3.1 Estimating importance measure from randomForestSRC package 
+This is the implemented function offered by randomForest which can be very convenient, but it only uses randomForest objects and is not very flexible. For that reason, it will no longer be used in he next sections.
+
+### 5.3.2 Estimating importance measure from randomForestSRC package 
 
 This package allows much more flexibility and has more parametrization when it comes to computing variable importance. Before proceeding, a forest will be trained just like in the previous section.
 
-```{r RF using randomForestSRC , warning=FALSE , message= FALSE , tidy=TRUE , digits = 4 }
+```{r RF using randomForestSRC , warning=FALSE , message= FALSE}
 # First , loading the package
 library("randomForestSRC")
 
@@ -643,7 +656,7 @@ Bench_rfsrc_class <- length(which(pred_bench_src_class == test_class$Class )) /+
 
 The performance of the model using randomForestSRC is very close to the older version : `r format(Bench_rfsrc_class , digits =4)`
 
-```{r Fitting a randomg using randomForestsrc for the regression task , tidy=TRUE , digits = 4 }
+```{r Fitting a randomg using randomForestsrc for the regression task }
 # Fitting the regression model
 set.seed(1234)
 rfsrc_reg <- rfsrc( cmedv ~ . , data = train_reg , ntree = 500 )
@@ -660,13 +673,14 @@ The performance of the models using randomForestSRC for the regression task is a
 
 The following steps will allow us to estimate variable importance using these different grown forests and compare the different available procedures since the package allows more options. The first formula to explore is the ***vimp.rfsrc()**
 
-```{r Computing variable importance using the vimp() function , fig.height=3 , fig.align="center" , fig.width=10 }
+```{r Computing variable importance using the vimp() function , fig.height=3 , fig.align="center" , fig.width=10 , fig.cap="The methods for variable importance calculation vary from function to function. This one uses 3 types of different approaches to break the link with the response variable. The results are diplayed for all three, permute, random and anti." }
 #The vimp() function allows to select three different types of error computation.
 #Classification task first
 
 #Permutation
 imp_src_class_1 <- vimp(rfsrc_class , importance = "permute" , block.size = 1 )
-#The following code gets the overall importance of each variable instead of class specific
+#The following code gets the overall importance of each variable instead 
+#of class specific
 imp_src_class_1 <- sort(imp_src_class_1$importance[,1])
 
 #Random 
@@ -678,7 +692,7 @@ imp_src_class_3 <- vimp(rfsrc_class , importance = "anti" , block.size = 1 )
 imp_src_class_3 <- sort(imp_src_class_3$importance[,1])
 
 #Plot to compare the importance per method, NEEDS A LITTLE ATTENTION
-par(mfrow = c(1,3))
+par(mfrow = c(1,3) , cex.axis = 0.8 , cex.lab = 0.8 , cex.main = 0.8)
 dotchart(imp_src_class_1[10:14] , main = "Permutation" , xlim = c(0 , 0.2))
 dotchart(imp_src_class_2[10:14] , main = "Random" , xlim = c(0 , 0.2))
 dotchart(imp_src_class_3[10:14] , main = "Opposite split" , xlim = c(0 , 0.2))
@@ -687,7 +701,7 @@ For this dataset, the **vimp()** function seem to have a very similar result acc
 
 Now, for the regression task, the following code is applied, which is very similar to the previous one.
 
-```{r calculating variable importance on regression using vimp , fig.height= 3 , fig.align="center" , fig.width = 10}
+```{r calculating variable importance on regression using vimp , fig.height= 3 , fig.align="center" , fig.width = 10 , fig.cap="This figure diplays the results of importance calculation for the regression task"}
 # Permutation on the regression data
 imp_src_reg_1 <- vimp(rfsrc_reg , importance = "permute" , block.size = 1  )
 imp_src_reg_1 <- sort(imp_src_reg_1$importance)
@@ -699,14 +713,14 @@ imp_src_reg_3 <- vimp(rfsrc_reg , importance = "anti" , block.size = 1  )
 imp_src_reg_3 <- sort(imp_src_reg_3$importance)
 
 #Ploting
-par(mfrow = c(1,3))
+par(mfrow = c(1,3) , cex.axis = 0.8 , cex.lab = 0.8 , cex.main = 0.95)
 dotchart(imp_src_reg_1[16:20] , main = "Permutation" , xlim = c(0 , 120))
 dotchart(imp_src_reg_2[16:20] , main = "Random" , xlim = c(0 , 120))
 dotchart(imp_src_reg_3[16:20] , main = "Opposite split" , xlim = c(0 , 120))
 ```
 Similar to the results obtained using the classification dataset, the three methods lead to similar conclusion. The most important variables from all type of calculations are concording and there are no significant differences. An important modification that could be analysed is the number of tree in the block.size argument. This parameter is explained in the function definition in the previous section. The following chunk of code tests out tha variable importance values using different values of block.size.
 
-```{r varying the nunmber of tree in the block size}
+```{r varying the nunmber of tree in the block size , fig.width=10 , fig.cap="Using the permute method for all block size, the goal was to verify the effect of changing the argument on variable importance score"}
 #Block size varying [1 , 10 , 50 , 100 , 500]
 block_size = c(1 , 10 , 50 , 100 , 200 , 500)
 imp_block_size = list()
@@ -715,35 +729,44 @@ for (i in block_size){
   imp_block_size[[i]] = sort(imp_block_size[[i]]$importance[,1])
 }
 
-par(mfrow = c(2 , 3))
+par(mfrow = c(2 , 3) , cex.axis = 1.1 , cex.lab = 0.8 , cex.main = 1.1)
 # We need to find a way to plot them together
 for( i in block_size) {
-  dotchart(imp_block_size[[i]][10:14] , main = paste("block size" , as.character(i)) , xlim = c(0 , 0.15))
+  dotchart(imp_block_size[[i]][10:14] , 
+           main = paste("block size" , as.character(i)) , xlim = c(0 , 0.15))
 }
 ```
 The advantage of using a block size larger than one is to save on computing time when the number of observations and the number of variables is very large. In case the model is very complex, this option can lead to more efficient ways of estimating variable importance. But, as the block size increases, we can see a decrease in the method to evaluate the importance of each variable. This is due to the fact that , when the block size is equal to the total number of trees, the out of back error on permutation is compared to the whole forest instead of it's corresponding tree.
 
 An other way to compute variable importance using randomForestSRC is by using the holdout method. It is possible due to it's implementation in the function **holdout.vimp()**. This function allows to holdout certain variables from growing trees in the random forest algorithm. The typical number of variables to holdout is 1.
 
-```{r holdout.vimp function to compare , fig.align="center" , fig.height=3 , fig.width=10}
+```{r holdout.vimp function to compare , fig.align="center" , fig.height=3 , fig.width=10, fig.cap="The hold out approach leaves some variables out from the process of growing trees. This method leads to different results compared to the previous two. The number of variables heldout here is 1 per iteration"}
 # Computing variable importance for the classification task
-imp_hold_class <- holdout.vimp( Class ~. , data= train_class , ntree = 500 , block.size = 1 , ntime = 100)
+imp_hold_class <- holdout.vimp( Class ~. , data= train_class , ntree = 500 ,
+                                block.size = 1 , ntime = 100)
+
 imp_hold_class <- sort(imp_hold_class$importance[,1])
 
 # Computing cariable importance for the regression task
-imp_hold_reg <- holdout.vimp(cmedv ~. , data= train_reg , ntree = 500 , block.size = 1 , ntime = 100)
+imp_hold_reg <- holdout.vimp(cmedv ~. , data= train_reg , ntree = 500 ,
+                             block.size = 1 , ntime = 100)
+
 imp_hold_reg <- sort(imp_hold_reg$importance)
 
 # Plot of the results
-par(mfrow = c(1,2) , cex.axis = 0.8 , cex.lab = 0.8 , cex.main = 0.8)
-dotchart(imp_hold_class[5:9] , labels = rownames(imp_hold_class) , main = "Classifcation task" , xlim = c(min(imp_hold_class[5:9]) - 0.001 , max(imp_hold_class[5:9] + 0.001) ) )
-dotchart(imp_hold_reg[11:15] , labels=rownames(imp_hold_reg) , main = "Regression task" , xlim = c(min(imp_hold_reg[11:15])-0.5 , max(imp_hold_reg[11:15])+ 0.5))
+par(mfrow = c(1,2) , cex.axis = 0.8 , cex.lab = 0.3 , cex.main = 0.75)
+dotchart(imp_hold_class[10:14] , labels = rownames(imp_hold_class) , 
+         main = "Classifcation task" , xlim = c(min(imp_hold_class[10:14]) - 0.001 , 
+                                                max(imp_hold_class[10:14] + 0.001) ) )
+dotchart(imp_hold_reg[16:20] , labels=rownames(imp_hold_reg) ,
+         main = "Regression task" , xlim = c(min(imp_hold_reg[16:20])-0.5 , 
+                                             max(imp_hold_reg[16:20])+ 0.5))
 ```
 Using the holdout function, some new variables in the classifcation data set are shown as important compared to the previous method. Mitoses, for example, was not part of the most important ones. In order to easily compare the agreement between all the methods, a rank plot between diffrent pairs will help clarify. 
 
 This rank plot will only be completed on the classification task, but the exact same logic can be applied to the regression task as well. In addition, the importance measures used for this comparison will be the classical method using **importance** function from the **randomForest** package , the **vimp** function using the permutation method with block size set to 1 and the holdout method using the **holdout.vimp** from the randomForestSRC package. The analysis is restricted to those three for the sake of the tutorial, but further study could completed if necessary by varying different parameters of the functions.
 
-```{r comparing the ranking of the methods by pair , fig.align="center" , fig.height=3 , fig.width=10}
+```{r comparing the ranking of the methods by pair , fig.align="center" , fig.height=3 , fig.width=10 ,fig.cap="This figure ranks pairwise the importance using the thee methods to identify their agreement. If the dots form a positive linear trend, then the methods agree."}
 #Create the ranking
 # 9 variables in the classification task
 rank <- seq(1 , length(imp_class_1) , 1)
@@ -758,35 +781,44 @@ data_1$classic_rank <- rank
 data_1$MeanDecreaseAccuracy <- NULL
 
 # Vimp function
-imp_src_class_1 <- sort(imp_src_class_1 , decreasing = TRUE); data_2 <-cbind(imp_src_class_1 , rank)
+imp_src_class_1 <- sort(imp_src_class_1 , decreasing = TRUE)
+data_2 <-cbind(imp_src_class_1 , rank)
 covariates_2 <- rownames(data_2)
-data_2 <- as.data.frame(data_2 ) ; data_2$covariates <- covariates_2
-data_2$imp_src_class_1 <- NULL ; colnames(data_2) <- c("Vimp_rank" , "covariates")
+data_2 <- as.data.frame(data_2 )
+data_2$covariates <- covariates_2
+data_2$imp_src_class_1 <- NULL
+colnames(data_2) <- c("Vimp_rank" , "covariates")
 
 # holdout function
-imp_hold_class <- sort(imp_hold_class , decreasing = TRUE) ; data_3 <-cbind(imp_hold_class , rank)
+imp_hold_class <- sort(imp_hold_class , decreasing = TRUE)
+data_3 <-cbind(imp_hold_class , rank)
 covariates_3 <- rownames(data_3)
-data_3 <- as.data.frame(data_3) ; data_3$covariates <- covariates_3
-data_3$imp_hold_class <- NULL ; colnames(data_3) <- c("Hold_rank" , "covariates")
+data_3 <- as.data.frame(data_3)
+data_3$covariates <- covariates_3
+data_3$imp_hold_class <- NULL
+colnames(data_3) <- c("Hold_rank" , "covariates")
 
 #Merging
 data_m <- merge(data_1 , data_2 , by="covariates")
 data_m <- merge(data_m , data_3 , by="covariates")
 
 # plot hold-classic , hold-vimp , vimp-classic
-par(mfrow = c(1 , 3) , cex.main=0.8)
-plot(data_m$Hold_rank , data_m$classic_rank , xlab = "Holdout ranking" , ylab = "classic ranking")
+par(mfrow = c(1 , 3) , cex.main=0.8  , cex.axis = 1 , cex.lab = 1.1)
+plot(data_m$Hold_rank , data_m$classic_rank , 
+     xlab = "Holdout ranking" , ylab = "classic ranking")
 axis(2, at = seq(1, 9, by = 1), las=0) ; axis(1, at = seq(1, 9, by = 1), las=0)
-plot(data_m$Hold_rank , data_m$Vimp_rank , xlab = "Holdout ranking" , ylab="Vimp ranking")
+plot(data_m$Hold_rank , data_m$Vimp_rank , 
+     xlab = "Holdout ranking" , ylab="Vimp ranking")
 axis(2, at = seq(1, 9, by = 1), las=0) ; axis(1, at = seq(1, 9, by = 1), las=0)
-plot(data_m$Vimp_rank , data_m$classic_rank, xlab ="Vimp ranking" , ylab="classic ranking")
+plot(data_m$Vimp_rank , data_m$classic_rank, 
+     xlab ="Vimp ranking" , ylab="classic ranking")
 axis(2, at = seq(1, 9, by = 1), las=0) ; axis(1, at = seq(1, 9, by = 1), las=0)
 mtext("Ranking comparison of variable importance" , outer = TRUE , line = -1.5)
 ```
 
 This pairwise comparison shows that the **holdout.vimp** function estimates importance very differently compared to the previous two methids since the rankings are not similar. On the other hand, the classic methond and the regular vimp function show a very close ranking. It can be seen on the right plot.
 
-### 5.3.2 Summary
+### 5.3.3 Summary
 The previous demonstrations of variable importance calculations have indicated that the methods tend to agree with the most important variables and their ability to detect which ones have an impact on the response variable depends on the parameters used. For example, when changing the error type, the ranking changes as well when using the variable importance function. Modifiying how the link with the response variable is broken when using the vimp function also modifies the importance measures. In general, the two functions, **vimp** and **importance** provide similar conclusions whereas the **holdout.vimp** method does not agree with the results of the first two. Finally, when using the block.size argument on the vimp function, as the value for this parameter increases, the method's ability to distinguish important variables decreases. It can be very useful to reduce computing time when the number of instances and the number of variables is large, but in general context, there is a tradeoff in terms of quality. 
 
 To conclude this section, computing variable importance can be used for interpretation and get a rough idea of which variable impacts the response variable the most. For prediction purposes, this step is completed in order to discriminate variables from model based on different factors, generaly the ranking of variable importance. The following section is a tutorial on implementing methods that use variable importance to select which variables to keep in the model to perform predictions.
@@ -802,7 +834,7 @@ library("varSelRF")
 library("vita")
 ```
 
-
+### 5.4.1 Boruta
 ```{r Boruta approach , warning = FALSE , message=FALSE}
 # Using Boruta to make variable selection
 Boruta_class <- Boruta(Class ~., data = train_class)
@@ -835,7 +867,8 @@ pred_boruta_class <- predict(boruta_rf_class , newdata = test_class , type = "re
 pred_boruta_reg <- predict(boruta_rf_reg , newdata = test_reg , type="response")
 
 #good classification rate
-boruta_rate_class <- length(which(pred_bench_class == test_class$Class )) / nrow(test_class)
+boruta_rate_class <- length(which(pred_bench_class == test_class$Class )) /+
+  nrow(test_class)
 
 #Confusion matrix below present the results of the classification task
 c_mat_2 <- table(pred_boruta_class , test_class$Class)
@@ -845,11 +878,14 @@ MSE_Boruta <- mean(( pred_boruta_reg - test_reg$cmedv)^2)
 MAE_Boruta <- mean(abs(pred_boruta_reg - test_reg$cmedv))
 ```
 
+### 5.4.2 VSURF 
+
 The second function to demonstrate is from the **VSURF** package. This method uses three steps to make variable selection.  
 
 ```{r Vsurf var selection , message=FALSE , warning=FALSE}
 # using the default parameters to perform variable selection
-vsurf_class <- VSURF(Class ~. , data=train_class , parallel=TRUE , ncores=4 , verbose=FALSE)
+vsurf_class <- VSURF(Class ~. , data=train_class , parallel=TRUE ,
+                     ncores=4 , verbose=FALSE)
 ```
 
 After performing the algorithm, displaying the list of variables selected at each step can be done by the following code.
@@ -902,7 +938,8 @@ pred_vsurf_class <- predict(rf_vsurf_class , newdata = test_class , type ="respo
 pred_vsurf_reg <- predict(rf_vsurf_reg , newdata = test_reg , type="response")
 
 #good classification rate
-vsurf_rate_class <- length(which(pred_vsurf_class == test_class$Class )) / nrow(test_class)
+vsurf_rate_class <- length(which(pred_vsurf_class == test_class$Class )) /+
+  nrow(test_class)
 
 #Confusion matrix below present the results of the classification task
 c_mat_3 <- table(pred_vsurf_class , test_class$Class)
@@ -913,6 +950,8 @@ MAE_vsurf <- mean(abs(pred_vsurf_reg  - test_reg$cmedv))
 ```
 
 Vsurf function had multiple interesting features and arguments to use that deepens the variable selection analysis. Now, the next function used to perform variable selection is called **varSelRF**
+
+### 5.4.3 VarSelRF 
 
 ```{r varselRF package , warning= FALSE , message= FALSE}
 #Loading the library
@@ -927,8 +966,9 @@ x_train_class$Class <- NULL ; x_test_class$Class <- NULL
 y_train_class <- train_class$Class ; y_test_class <- test_class$Class
 
 #Classification only. 
-varselrf_class <- varSelRF(x_train_class , y_train_class , ntree = 500 , recompute.var.imp = TRUE ,
-                          keep.forest = TRUE , verbose = FALSE)
+varselrf_class <- varSelRF(x_train_class , y_train_class , ntree = 500 ,
+                           recompute.var.imp = TRUE ,
+                           keep.forest = TRUE , verbose = FALSE)
 
 varselrf_class$selected.vars
 ```
@@ -944,9 +984,76 @@ pred_varsel_class <- predict(varsel_rf , newdata = test_class , type ="response"
 
 
 #good classification rate
-varsel_rate_class <- length(which(pred_varsel_class == test_class$Class )) / nrow(test_class)
+varsel_rate_class <- length(which(pred_varsel_class == test_class$Class )) /+
+  nrow(test_class)
 
 #Confusion matrix below present the results of the classification task
 c_mat_4 <- table(pred_varsel_class , test_class$Class)
 ```
 
+### 5.4.4 Performance summary 
+
+To summarize the results and the analysis of these functions used to select the best variables, we will compare their respective performance based on their prediction accuracy. 
+
+### Classification task performance summary
+|**Function**|**Good classification rate**|
+|:-:|:-:|
+|Benchmark | `r format(Bench_class, digits=4)`|
+|Benchmark SRC | `r format(Bench_rfsrc_class, digits=4)`|
+|Boruta | `r format(boruta_rate_class, digits=4)`|
+|VSURF | `r format(vsurf_rate_class, digits=4)`|
+|varSelRF|`r format(varsel_rate_class, digits=4)`|
+
+On the classification data set, the number of initial covariates was `r ncol(train_class) - 1`. We added 5 noise variables to verify if the selection methods would identify them as important or not. All methods were able to remove them from the model. In this case, the resulting good classification rate was equal even if they did not select the exact same predictors. Boruta used all variables in the dataset except the added noise , vsurf approach selected 7 original variables which were presented above.This method also removed all noise. Finaly , varSelRF only used 4 variables to arrive at to the same performance. It selected Bare.nuclei, Cell.shape , cell.size and Normal.nucleoli. For model simplicity, it is better to use less variables. For that, variable selection in this context proved itself useful. The data set used was fairly simple as well. It didn't contain highly correlated covariates or an excessive number of covariates compared to the number of instances. If $n << p$ and if they were significantly correlated, then it might have had important impacts on the ability of the vanilla random forest to predict well without variable selection. Also, in the related work section, multiple studies showed the effects of such difficult data sets and their impoct on both basic prediction and variable selection. 
+
+For the regression task, the results obtained were different from one method to the other.
+
+### Regression task performance summary
+|**Function**|**MSE**|**MAE**|
+|:-:|:-:|:-:|
+|Benchmark | `r format(MSE_bench, digits=4)`|`r format(MAE_bench, digits=4)`|
+|Benchmark SRC|`r format(MSE_bench_src, digits=4) `|`r format(MAE_bench_src, digits=4)`|
+|Boruta|`r format(MSE_Boruta, digits=4) `|`r format(MAE_Boruta, digits=4)`|
+|VSURF|`r format(MSE_vsurf, digits=4) `|`r format(MAE_vsurf, digits=4)`|
+
+The best performing variable selection approach is Boruta and it seems like the VSURF approach lead to the worse results. The Boruta approach , in this context, selected all original variables except chas and was able to delete all noise. On the other hand, the VSURF approach had cut a lot of variables. It only used 5 variables from the whole data set. This significantly impacted the performance and as presented on the table, the mean absolute error is more than twice higher than the one obtained by the basic approach. 
+
+
+### Conclusion and overview
+When fitting a random forest, it can be difficult to understand how the prediction is impacted by the choice of predictors without the concepts of variable importance and variable selection. The idea behind these methods is to break the link of the original values of each covariate with the response variable in order to estimate the negative impact on the quality of the prediction. This importance estimation is then used to perform variable selection and improve the predictions accuracy as well as a simplification of the model and the data complexity. 
+
+There are multiple approaches allowing to perfom such calculations and selections. We found that Boruta offers a robust performance on both classification and regression task while varSelRF was capable of providing great insight on interpretation and simplifying models to arrive at equivalant performance. Vsurf on it's end, is very computationally heavy and did not lead to better accuracy. These results were obtained in a setting where the data was very easy and it could be interesting to increase the difficulty of the situation by adding correlated covaraites and reducing the number of instances to identify if the methods still perfom as well.
+
+These approaches should be rigorously tested as the performance can vary from data to data. For these tasks, the hyperparameters used were the same overall, but the number of trees, the number of variables as candidates to perform a split, the minimal size of nodes and far more parameters could be changed to assess the impact of such methods. This following tutorial was meant as a basic overview of each function, but the user has to make the best out of them by extensive hyperparameter tuning.
+
+\newpage
+
+## References
+[1] Kohavi, R.;John, G.H.1997.Wrappers for feature selection.Elsevier:Artificial Intelligence p.273-324 
+ 
+[2] Guyon, I.;Elisseeff, A.2003.An introduction to Variable and Feature Selection.Journal of machine learning reserach 
+ 
+[3] Breiman, L.2001.Random forests.Cluver Kluwer Academic Publishers.Machine Learning,45,5-32 
+ 
+[4] Genuer, R.; Poggi, J-M.;Tuleau-Malot, C.2010.Variable Selection using random forests.Elsevier 
+ 
+[5] Archer, K.J; Kimes, R.V.2008.Empirical characterization of random forest variable importance measures. Computational Statistics & Data Analysis 
+ 
+[6] Auret, L; Aldrich, C.2011. Empirical comparison of tree ensemble variable importance measures.Chemometrics and intelligent laboratory systems p.157-170. 
+ 
+[7] Ishwaran, H.2007. Variable importance in binary regression trees and forests. Electronic journal of statistics. 
+ 
+[8] Altmann, A.; Tolosi, L.; Sander, O.; et al.2010.Permutation importance: a corrected feature importance measure. Bioinformatics;26:1340–7. 
+ 
+[9] Szymczak, S.; Holzinger, E.; Dasgupta, A.; et al.2016.r2VIM: a new variable selection method for random forests in genome-wide association studies. BioData Min;9:1. 
+ 
+[10] Janitza, A.; Boulesteix, A-L.2015. A computationally fast variable importance test for random forests for high-dimensiional data. Advances in Data Analysis and classification. 
+ 
+[11] Gregorutti, B.; Bertrand, M.; Philippe, S-P.2017.Correlation and variable importance in random forests.Springer Science + business media. 
+ 
+[12] Kursa, M.; Rudnicki, W.2010.Feature selection with the Boruta package.Journal of statistical software. V.36. Issue.11 
+ 
+[13] Genuer, R.;Poggi, J-M.;Tuleau-Malot, C.2015. VSURF: An R Package for Variable Selection Using Random Forests. The R Journal 7(2):19-33 
+ 
+[14] Murphy, M.A;Evans, J.S;Storfer,A.S.2010. Quantify Bufo boreas connectivity in Yellowstone National Park with landscape genetics. Ecology 91:252-261 
+ 
