@@ -510,7 +510,9 @@ In order to perform the analsis require to compare model performance, it is impo
 set.seed(12345)
 index = sort(sample(nrow(BreastCancer), nrow(BreastCancer)*.8))
 train_class = BreastCancer[index , ]
+train_class$Id <- NULL
 test_class = BreastCancer[-index , ]
+test_class$Id <- NULL
 
 #Regression data
 set.seed(12345)
@@ -530,7 +532,7 @@ The first model to be fit is on the BreastCancer data and the good classificatio
 library("randomForest")
 
 #Fitting the randomForest, note that importance is set as true for future reference.
-rf_class <- randomForest(Class ~ . - Id, data = train_class , importance = TRUE )
+rf_class <- randomForest(Class ~ . , data = train_class , importance = TRUE )
 
 #Predicting on the test set
 pred_bench_class <- predict(rf_class , newdata = test_class , type = "response")
@@ -576,7 +578,100 @@ imp_class_1 <- importance(rf_class , type = 1 , scale = TRUE )
 imp_class_2 <- importance(rf_class , type = 2 , scale = TRUE)
 
 # Visualing the results using the plot function most important and the three least important.
-varImpPlot(rf_class , sort = TRUE , n.var = 5 , main = "Variable Importance" , scale = TRUE)
+varImpPlot(rf_class , sort = TRUE , n.var = 5 , 
+           main = "Variable importance : classification task" , 
+           scale = TRUE)
+```
+This previous figure displays the top five important variables based on the error decrease selected. On the left graph, type = 1 is chosen. The graph on the right, on the other hand uses type=2. Both methods selected the same four variables except for cell thickness which was only selected by the mean decrease in accuracy and normal nucleoli, which was only selected by the mean decrease in gini index. Although the method use the same algorithm, the simple modification in the type of error calculated leads to different results.
+
+For the regression task, the same steps can followed in order to obtain the needed measure.
+```{r Variable importance for the regression case , tidy=TRUE , digits = 4 } 
+
+# Computing variable importance for regression task : increase in MSE
+imp_reg_1 <- importance(rf_reg , type = 1 , scale = TRUE)
+
+# Computing variable importance for regression task : increase in Node purity
+imp_ref_2 <- importance(rf_reg , type = 2 , scale = TRUE)
+
+# Plotting the results
+varImpPlot( rf_reg , n.var = 5 , main = "Variable importance : regression task" , 
+            scale = TRUE)
 ```
 
+For this task, the two methods agree on the first three variables, but not on the 4th and 5th. A more exhaustive comparison will be provided at the end of this section.
 
+### 5.3.1 Estimating importance measure from randomForestSRC package 
+
+This package allows much more flexibility and has more parametrization when it comes to computing variable importance. Before proceeding, a forest will be trained just like in the previous section.
+
+```{r RF using randomForestSRC , warning=FALSE , message= FALSE , tidy=TRUE , digits = 4 }
+# First , loading the package
+library("randomForestSRC")
+
+#Classification
+# Fitting a tree using the default parameters
+set.seed(1234)
+rfsrc_class <- rfsrc( Class ~ . , data = train_class , ntree = 500 )
+
+#Predictions 
+pred_bench_src_class <- predict(rfsrc_class , newdata =  test_class)
+
+#The output when using randomForest src is a list of objects. It only outputs probs.
+#The following code transforms the output to the same format as the test data.
+pred_bench_src_class <- ifelse(pred_bench_src_class$predicted[,1] > 0.5 ,
+                               "benign" , "malignant")
+pred_bench_src_class <- as.factor(pred_bench_class)
+
+Bench_rfsrc_class <- length(which(pred_bench_src_class == test_class$Class )) /+
+  nrow(test_class)
+```
+
+The performance of the model using randomForestSRC is very close to the older version : `r format(Bench_rfsrc_class , digits =4)`
+
+```{r Fitting a randomg using randomForestsrc for the regression task , tidy=TRUE , digits = 4 }
+# Fitting the regression model
+set.seed(1234)
+rfsrc_reg <- rfsrc( cmedv ~ . , data = train_reg , ntree = 500 )
+
+#Making predictions
+pred_bench_src_reg <- predict(rfsrc_reg , newdata = test_reg  )
+
+#Evaluating performance
+MSE_bench_src <- mean((pred_bench_src_reg$predicted - test_reg$cmedv)^2)
+MAE_bench_src <- mean(abs(pred_bench_src_reg$predicted - test_reg$cmedv))
+```
+
+The performance of the models using randomForestSRC for the regression task is also very competitive and close to the older version. It's slightly worse. The mean absolute error is `r format(MAE_bench_src , digits=4)` and the mean squared error is `r format(MSE_bench_src , digits=4)`
+
+The following steps will allow us to estimate variable importance using these different grown forests and compare the different available procedures since the package allows more options. The first formula to explore is the ***vimp.rfsrc()**
+
+```{r Computing variable importance using the vimp() function}
+#The vimp() function allows to select three different types of error computation.
+#Classification task first
+
+#Permutation
+imp_src_1 <- vimp(rfsrc_class , importance = "permute" , block.size = 1 )
+#The following code gets the overall importance of each variable instead of class specific
+imp_src_1 <- imp_src_1$importance[,1]
+
+#Random 
+imp_src_2 <- vimp(rfsrc_class , importance = "random" , block.size = 1 )
+imp_src_2 <- imp_src_2$importance[,1]
+
+#Opposite split
+imp_src_3 <- vimp(rfsrc_class , importance = "anti" , block.size = 1 )
+imp_src_3 <- imp_src_3$importance[,1]
+
+#Unlike the randomforest package, this package does not include a ploting option
+#So we will make the plot using the following code
+covariates <- rownames(as.data.frame(imp_src_1))
+
+#Plot to compare the importance per method, NEEDS A LITTLE ATTENTION
+par(mfrow = c(1,3))
+dotchart(imp_src_1 , main = "Permutation" , xlim = c(0 , 0.25))
+dotchart(imp_src_2 , main = "Random" , xlim = c(0 , 0.25))
+dotchart(imp_src_3 , main = "Opposite split" , xlim = c(0 , 0.25))
+```
+For this dataset, the **vimp()** function seem to have a very similar result accross all methods used within the function to evaluate variable importance. The most important variable is the cell size and the least important one is the mitoses.
+
+An other way to compute variable importance using randomForestSRC is by using the holdout method. It is possible thanks to the function **holdout.vimp()**.
